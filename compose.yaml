@@ -1,0 +1,20 @@
+name: finguard
+services:
+  finguard:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8765:8765"
+    environment:
+      TZ: Europe/Moscow
+      FINGUARD_PASSWORD: "${FINGUARD_PASSWORD:?Set FINGUARD_PASSWORD in .env (12 characters or more)}"
+      FINGUARD_ALLOWED_HOSTS: "${FINGUARD_ALLOWED_HOSTS:-127.0.0.1,localhost}"
+    volumes:
+      - finguard-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,base64,urllib.request; r=urllib.request.Request('http://localhost:8765/api/health'); r.add_header('Authorization','Basic '+base64.b64encode(('finguard:'+os.environ['FINGUARD_PASSWORD']).encode()).decode()); urllib.request.urlopen(r,timeout=3)"]
+      interval: 10s
+      timeout: 4s
+      retries: 12
+volumes:
+  finguard-data:

@@ -1,0 +1,26 @@
+name: FinGuard checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  docker-tests:
+    name: Docker build and 89 tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Check tracked file boundaries
+        run: python3 scripts/check_repository.py
+      - name: Build frontend and test image
+        run: docker build --target test -t finguard-ci .
+      - name: Run regression and API tests
+        run: docker run --rm --network none -e TZ=Europe/Moscow finguard-ci

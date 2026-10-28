@@ -1,0 +1,9 @@
+name: finguard-tests
+services:
+  tests:
+    build:
+      context: .
+      target: test
+    environment:
+      TZ: Europe/Moscow
+      FINGUARD_DATA_DIR: /tmp/finguard-tests

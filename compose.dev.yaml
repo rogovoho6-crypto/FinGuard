@@ -1,0 +1,38 @@
+name: finguard-dev
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: backend
+    ports:
+      - "127.0.0.1:8766:8765"
+    environment:
+      TZ: Europe/Moscow
+    volumes:
+      - ./backend:/app/backend:ro
+      - dev-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8765/api/health', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: frontend
+    ports:
+      - "127.0.0.1:5173:5173"
+    environment:
+      VITE_API_TARGET: http://backend:8765
+      VITE_USE_POLLING: "1"
+    volumes:
+      - ./frontend/src:/app/src:ro
+      - ./frontend/index.html:/app/index.html:ro
+      - ./frontend/vite.config.ts:/app/vite.config.ts:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+volumes:
+  dev-data:

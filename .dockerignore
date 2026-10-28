@@ -1,0 +1,11 @@
+.git
+.venv
+**/__pycache__
+frontend/node_modules
+frontend/dist
+build
+dist
+.env
+data
+*.sqlite3
+validation
