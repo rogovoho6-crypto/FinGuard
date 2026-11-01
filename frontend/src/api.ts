@@ -5,7 +5,7 @@ export async function api<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch('/api/' + path, {method: body === undefined ? 'GET' : 'POST', headers: body === undefined ? {} : {'Content-Type': 'application/json', 'X-FinGuard-Token': token}, body: body === undefined ? undefined : JSON.stringify(body)});
   const content = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const message = typeof content.detail === 'string' ? content.detail : response.status === 422 ? 'Проверьте заполнение полей: значения должны соответствовать указанным ограничениям.' : 'Сервер недоступен. Проверьте, что FinGuard Web запущен.';
+    const message = typeof content.detail === 'string' ? content.detail : response.status === 422 ? 'Проверьте заполнение полей: значения должны соответствовать указанным ограничениям.' : 'Сервер недоступен. Проверьте, что FinGuard запущен.';
     throw new ApiError(response.status, message);
   }
   return content as T;
